@@ -7,20 +7,45 @@ with atheris.instrument_imports(include=['fastkml']):
     import fastkml as kml
     from fastkml.enums import DateTimeResolution
     from fastkml.times import KmlDateTime
+    from fastkml import atom
+    from fastkml import base
+    from fastkml import config
+    from fastkml import data
+    from fastkml import kml
+    from fastkml import styles
+    from fastkml.geometry import Geometry
+    from fastkml.geometry import GeometryCollection
+    from fastkml.geometry import LinearRing
+    from fastkml.geometry import LineString
+    from fastkml.geometry import MultiLineString
+    from fastkml.geometry import MultiPoint
+    from fastkml.geometry import MultiPolygon
+    from fastkml.geometry import Point
+    from fastkml.geometry import Polygon
+    from fastkml.gx import GxGeometry
 
 def TestOneInput(data):
     fdp = atheris.FuzzedDataProvider(data)
     if len(data) == 0:
         return 0
     year = fdp.ConsumeIntInRange(1900, 2023)
-    day = fdp.ConsumeIntInRange(1, 28)
+    day = fdp.ConsumeIntInRange(1, 12)
     month = fdp.ConsumeIntInRange(1, 12)
-    choice = fdp.ConsumeIntInRange(0, 3)
-    consumed_bytes = fdp.ConsumeBytes(fdp.remaining_bytes())
+    choice = fdp.ConsumeIntInRange(0, 10)
+    consumed_bytes = fdp.ConsumeBytes(fdp.ConsumeIntInRange(20, 2000))
     try:
         if choice == 1:
             dt = datetime.datetime(year=year, day=day, month=month)
-            kdt = KmlDateTime(dt, DateTimeResolution.year)
+            KmlDateTime(dt, DateTimeResolution.year)
+        elif choice == 2:
+            kml._Feature(name="A Feature")
+        elif choice == 3:
+            KmlDateTime.parse(str(year) + "-03")
+            KmlDateTime.parse(str(year))
+        elif choice == 4:
+            now = KmlDateTime(datetime.datetime.now())
+            y2k = KmlDateTime(datetime.datetime(year, day, month))
+            kml.TimeSpan(end=now, begin=y2k)
         else:
             # Create the root KML object
             k = kml.KML()
