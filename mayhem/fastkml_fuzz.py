@@ -49,6 +49,10 @@ def TestOneInput(data):
         else:
             # Create the root KML object
             k = kml.KML()
+            if choice == 5:
+                k.features()
+            else:
+                k.etree_element()
             ns = "{http://www.opengis.net/kml/2.2}"  # noqa: FS003
 
             # Create a KML Document and add it to the KML root object
@@ -60,8 +64,18 @@ def TestOneInput(data):
             d.append(f)
 
             # Create a KML Folder and nest it in the first Folder
-            nf = kml.Folder(ns, "nested-fid", "nested f name", consumed_bytes.decode('utf-8'))
-            f.append(nf)
+            if choice == 7:
+                nf = kml.Folder(ns, "nested-fid", "nested f name", consumed_bytes.decode('utf-8'))
+                f.append(nf)
+            else:
+                f2 = kml.Folder(ns, "id2", "name2", "description2")
+                d.append(f2)
+                p = kml.Placemark(ns, "id", "name", "description")
+                if choice == 8:
+                    p.geometry = Polygon([(0, 0, 0), (1, 1, 0), (1, 0, 1)])
+                    p2 = kml.Placemark(ns, "id2", "name2", "description2")
+                    # p2 does not have a geometry!
+                    f2.append(p)
     except UnicodeDecodeError:
         return
     except Exception:
